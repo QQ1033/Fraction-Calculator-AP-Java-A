@@ -1,0 +1,317 @@
+/*
+ Aiden Loza
+ Fraction Calculator 
+ AP CSA Period 2 - Mr. Binz
+ 1/28/24
+ */
+import java.util.*;
+public class FracCalc{
+    /*
+     Hello, welcome to the Fraction Calculator.
+     This calculator was made to handle any input of addition, subtraction, multiplication, and division for any two numbers and fractions,
+     as well as any whole number with a fraction, like 1 and 1/2 or - 35 and 6/124. For initial instruction on how to correctly input fractions and numbers, type "help". 
+     Have fun
+     */
+    public static Scanner console = new Scanner(System.in);
+    public static void main (String args[]){
+        //Main method that processes any expression, help, or quits the program.
+        System.out.println("Enter");
+        String input = console.nextLine();
+        //This line asks for input
+        
+        while (!input.equalsIgnoreCase("quit")){
+           System.out.println(processCommand(input)); 
+            input = getInput();
+        }
+        
+    }
+    public static String processCommand(String input){
+       if(UnitTestRunner.processCommand(input) == false){
+        if(input.equalsIgnoreCase("help")){//Returns helping text if the input is "help"
+            
+            System.out.println(helpingText());
+            return "";
+        } else {
+            //If the text is not "help" it processes the command as usual.
+            return processExpression(input);
+        }
+       }
+       return input;
+    }
+    public static String getInput(){//Method for asking for and obtaining input from the user.
+        System.out.println("Enter :");
+        String input = console.nextLine();
+        return input;
+        
+    }
+    public static String helpingText(){
+        //Helping text string
+        return ("When inputting a question, make sure to use the following format: \n If you are trying to add a fraction with a whole number, \n add the whole number then use an underscore to separate the whole number from the numerator. \n Make sure to not have any spaces at the start of the program, between the numerator, slash, or denominator. \n Additionally, the operator (+, - , * , /) \n which you are using needs to be surrounded by both sides by a space so that the program knows that it is an operator.");
+    }
+    public static int gcd(int a, int b){ //This method serves to find the greatest common divisor or any two integers.
+        if (a < 0 || b < 0){
+            return gcd(Math.abs(a), Math.abs(b));
+        }
+        if (a==0){
+            return b;
+        }
+        return gcd(b%a, a);
+        //returns an integer
+        
+    }
+    public static String processExpression(String input){
+       char Op = '0'; //Character that serves as the operator
+       int opLocation = 0; // Location of operator
+       int whole = 0; //Value for first whole number 
+       int num = 0; //Value for first numerator
+       int den = 0; //Value for first denominator
+       int slash1 = 0;  //Location of first fraction slash
+       int slash2 = 0;   //Location of second fraction slash
+       int whole2 = 0; //Value for second whole number 
+       int num2 = 0; //Value for second numerator
+       int den2 = 0; //Value for second denominator
+       int underscore1 = 0; //Location of first underscore (not present if value is zero)
+       int underscore2 = 0; //Location of second underscore (not present if value is zero)
+       boolean hasSlash1 = false;
+       boolean hasSlash2 = false;
+       String numSubstring = "";  //substring for numerator
+       String denSubstring = ""; //substring for denominator
+       
+       //GCD values for num/den of each fraction
+       int GCD = 0;
+       int GCD2 = 0;
+       
+       String wholeSubstring = "";
+       for(int d = input.length() -1 ; d >= 0; d--){ //This finds the operator location and what it is.
+                   if ((input.charAt(d) == '+' || input.charAt(d) == '-' 
+                   || input.charAt(d) == '*' || input.charAt(d) == '/') &&
+                   input.charAt(d+1) == ' ' && input.charAt(d+1) == ' '){
+                   Op = input.charAt(d);
+                   opLocation = d;
+                   break;
+            }
+       }
+       for (int i = 0; i < opLocation; i++){
+           //Finds if the first input value is a fraction
+           if (input.charAt(i) == '/' && !(input.charAt(i+1) == ' ') && !(input.charAt(i-1) == ' ' )){
+                slash1 = i;
+                hasSlash1 = true;
+           }
+           if (input.charAt(i) == '_'){
+                underscore1 = i;
+           }
+       }
+       for (int i = opLocation; i < input.length(); i++){
+           //Finds if the second input value is a fraction
+           if (input.charAt(i) == '/' && !(input.charAt(i+1) == ' ') && !(input.charAt(i-1) == ' ' )){
+                slash2 = i;
+                hasSlash2 = true;
+           }
+           if (input.charAt(i) == '_'){
+                underscore2 = i;
+           }
+       }
+       if (hasSlash1 == false){
+            //Takes the whole number for the first input
+            wholeSubstring = input.substring(0, opLocation-1);
+            int g = Integer.parseInt(wholeSubstring);
+            whole = g;
+            den = 1;
+
+       } else {
+           if (underscore1 == 0){
+               //Finds the numerator and denominator if there is no underscore (all for the first input)
+               numSubstring = input.substring(0,slash1);
+                int g = Integer.parseInt(numSubstring);
+                num = g;
+               denSubstring = input.substring((slash1+1),opLocation-1);
+               int k = Integer.parseInt(denSubstring);
+                den = k;
+
+           } else {
+               //Finds the first whole, numerator, and denominator.
+               wholeSubstring = input.substring(0, underscore1);
+               int g = Integer.parseInt(wholeSubstring);
+                whole = g;
+                numSubstring = input.substring(underscore1+1,slash1);
+                int l = Integer.parseInt(numSubstring);
+                num = l;
+                denSubstring = input.substring((slash1+1),opLocation-1);
+               int r = Integer.parseInt(denSubstring);
+                den = r;
+           }
+       }
+       if (hasSlash2 == false){
+           //Takes the whole number for the second input
+            wholeSubstring = input.substring(opLocation+2);
+            int g = Integer.parseInt(wholeSubstring);
+            whole2 = g;
+            den2 = 1;
+
+       } else {
+           if (underscore2 == 0){
+               //Finds the numerator and denominator if there is no underscore (all for the second input)
+               numSubstring = input.substring(opLocation+2,slash2);
+               
+                int g = Integer.parseInt(numSubstring);
+                num2 = g;
+               denSubstring = input.substring((slash2+1));
+               int k = Integer.parseInt(denSubstring);
+                den2 = k;
+
+           } else {
+               //Finds the second whole, numerator, and denominator.
+               wholeSubstring = input.substring(opLocation+2, underscore2);
+               int g = Integer.parseInt(wholeSubstring);
+                whole2 = g;
+                numSubstring = input.substring(underscore2+1,slash2);
+                int l = Integer.parseInt(numSubstring);
+                num2 = l;
+                denSubstring = input.substring((slash2+1));
+               int r = Integer.parseInt(denSubstring);
+                den2 = r;
+           }
+       }
+       
+       if (den < 0){
+           //If both num and den are negative makes them both positive
+            num *= -1;
+            den *= -1;
+       }
+       if (den2 < 0){
+           //Does the same as previous but for the second two.
+           num2 *= -1;
+           den2 *= -1;
+       }
+       
+       
+       if(whole2 < 0){
+           //Makes the numerator negative if the whole number attached is negative
+                           num2 *= -1;
+       }
+       
+       
+       
+       if(whole < 0){
+           //Makes the numerator negative if the whole number attached is negative
+                           num *= -1;
+       }
+       
+
+       //Fraction operations
+       int fractionAddnum = (num*den2 + num2*den);
+       
+       
+       int fractionSubnum = (num*den2 - num2*den);
+       int fractionden = (den*den2);
+       int mult1 = whole * den;
+       int mult2 =  whole2 * den2;
+       
+       //return "" + whole + " " + num + " " + den + " " + whole2 + " " + num2 + " " + den2;
+       
+       if(Op == '+'){ //Uses mathematical expressions to calculate the correct output for any addition input.
+          GCD = gcd(fractionAddnum, fractionden); 
+          
+           fractionAddnum /= GCD;
+           fractionden /= GCD;
+           int remainder = fractionAddnum % fractionden;
+          if (remainder == 0){
+           return "" + (whole + whole2 + (fractionAddnum/fractionden));
+           } else {
+               if (((whole + whole2 + (fractionAddnum/fractionden)) < 0)){
+                   int num3 = ((whole + whole2 + (fractionAddnum/fractionden)) * fractionden + remainder);
+                   if (num3/fractionden != 0) {
+                       return "" + num3/fractionden + "_" + -(num3 %fractionden) + "/" + fractionden;
+                   } else {
+                       return "" + (num3 % fractionden) + "/" + fractionden;
+                   }
+               }
+               if (((whole + whole2 + (fractionAddnum/fractionden)) != 0)){
+                   return "" + ((whole + whole2 + (fractionAddnum/fractionden)) + "_" + remainder + "/" + fractionden);
+               } else {
+                   return "" + remainder + "/" + fractionden;
+               }
+           
+           } 
+           
+       } 
+       if(Op == '*'){ //Uses mathematical expressions to calculate the correct output for any multiplication input.
+         int fractionMultnum1 = mult1 + num;
+         int fractionMultnum2 = mult2 + num2;
+         int completeMultnum = fractionMultnum1 * fractionMultnum2;
+         if (completeMultnum % fractionden == 0){
+             return "" + (completeMultnum/fractionden);
+             
+         } else {
+             int GCD4 = gcd((completeMultnum % fractionden), fractionden);
+             if ((completeMultnum/fractionden) == 0){
+                 return ((completeMultnum % fractionden)/GCD4) + "/" + (fractionden / GCD4);
+             }
+             if ((completeMultnum/fractionden) > 0){
+                 return "" + (completeMultnum/fractionden) + "_" + ((completeMultnum % fractionden)/GCD4) + "/" + (fractionden / GCD4);
+             } else {
+                 return "" + (completeMultnum/fractionden) + "_" + (-1*(completeMultnum % fractionden)/GCD4) + "/" + (fractionden / GCD4);
+             }
+             
+         }
+       }
+       if(Op == '/'){//Uses mathematical expressions to calculate the correct output for any divison input.
+         int fractionMultnum1 = mult1 + num;
+         int fractionMultnum2 = mult2 + num2;
+         int completeDivnum = fractionMultnum1 * den2;
+         int completeDivden = den * fractionMultnum2;
+         //return "" + fractionMultnum1 + " " + fractionMultnum2 + " " + completeDivnum + " " + completeDivden;
+         if (completeDivnum % completeDivden == 0){
+             return "" + (completeDivnum/completeDivden);
+             
+         } else {
+             int GCD4 = gcd((completeDivnum % completeDivden), completeDivden);
+             
+             
+             if ((completeDivnum/completeDivden) == 0){
+                 if(((completeDivnum % completeDivden)/GCD4) < 0 &&  (completeDivden/GCD4) < 0){
+                     return (-(completeDivnum % completeDivden)/GCD4) + "/" + -(completeDivden/GCD4);
+                 } else {
+                     return ((completeDivnum % completeDivden)/GCD4) + "/" + (completeDivden/GCD4);
+                 }
+                 
+             }
+             if ((completeDivnum/completeDivden) > 0){
+                 return "" + (completeDivnum/completeDivden) + "_" + ((completeDivnum % completeDivden)/GCD4) + "/" + (completeDivden/GCD4);
+             } else {
+                 return "" + (completeDivnum/completeDivden) + "_" + (-1*(completeDivnum % completeDivden)/GCD4) + "/" + (completeDivden/GCD4);
+             }
+             
+             
+         }
+         
+       }
+       if(Op == '-'){ //Uses mathematical expressions to calculate the correct output for any subtraction input.
+           GCD2 = gcd(fractionSubnum, fractionden); 
+           fractionSubnum /= GCD2;
+           fractionden /= GCD2;
+           int remainder2 = fractionSubnum % fractionden;
+          if (remainder2 == 0){
+           return "" + (whole - whole2 - (fractionSubnum/fractionden));
+           } else {
+               if (((whole - whole2 - (fractionSubnum/fractionden)) < 0)){
+                   return "" + ((whole - whole2 - (fractionSubnum/fractionden)) + "_" + -(remainder2) + "/" + fractionden);
+                }
+             
+               
+               if (((whole - whole2 - (fractionSubnum/fractionden)) != 0)){
+                   return "" + ((whole - whole2 - (fractionSubnum/fractionden)) + "_" + (remainder2) + "/" + fractionden);
+               } else {
+                   return "" + remainder2 + "/" + fractionden;
+               }
+           
+           } 
+       } 
+       
+       //Placeholder
+        return "";
+        
+    
+       
+    }    
+}
